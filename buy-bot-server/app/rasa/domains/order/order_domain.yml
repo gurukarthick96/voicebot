@@ -1,0 +1,22 @@
+version: "3.1"
+
+intents: [ ]
+
+entities: [ ]
+
+slots:
+  order:
+    type: any
+    mappings:
+      - type: controlled
+
+responses:
+  utter_summarize_cart:
+    - text: "{cart_summary}"
+
+  utter_order_goodbye:
+    - text: "Thank you for your order!"
+    - text: "Enjoy your meal!"
+    - text: "Order confirmed. Thank you for choosing OnDemand!"
+
+actions: [ ]

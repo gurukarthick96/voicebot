@@ -1,0 +1,75 @@
+flows:
+  ondemand_togo_order_flow:
+    if: slots.ondemand_workflow_type == 'ORDER_FOOD'
+    description: >
+      Guides the user through the food ordering, checkout and payment process using the IG OnDemand app with ToGo profile.
+    persisted_slots:
+      - ondemand_current_flow
+    steps:
+      - set_slots:
+          - ondemand_current_flow: TOGO_ORDER_CART
+      - link: ondemand_togo_order_cart_flow
+
+
+  ondemand_togo_order_cart_flow:
+    if: slots.ondemand_current_flow == 'TOGO_ORDER_CART'
+    description: >
+      Guides the user through the food ordering process using the IG OnDemand app with ToGo profile.
+      Dynamically handles item selection, quantity and modifiers to support flexible and natural food ordering conversations.
+    persisted_slots:
+      - ondemand_current_flow
+    steps:
+      - id: ask_user_intent_for_cart
+        collect: user_intent_for_cart
+        utter: utter_ask_user_intent_for_cart
+        description: >
+          Classify the user's input into one of the predefined cart intents (such as CHECKOUT, ADD_ITEMS, UPDATE_ITEMS, DELETE_ITEMS)
+
+          Sample Mappings (USER_INPUT -> USER_INTENT):
+            'Let's checkout' -> CHECKOUT
+            'Proceed further' -> CHECKOUT
+            'I'd like a <item>' -> ADD_ITEMS
+            'I want to order an <item> with <modifier>' -> ADD_ITEMS
+            'Give me <quantity1> <item1> and <quantity2> <item2>' -> ADD_ITEMS
+            'Add <quantity1> <item1> and <quantity2> <item2> to the cart' -> ADD_ITEMS
+            'Make the <item> as <quantity>' -> UPDATE_ITEMS
+            'Update the cart with <quantity> <item>' -> UPDATE_ITEMS
+            'Can you remove <item1> and <item2>' -> DELETE_ITEMS
+            'Get rid of <item> from the cart' -> DELETE_ITEMS
+        rejections:
+          - if: not slots.user_intent_for_cart
+            utter: utter_invalid_slot
+      - action: action_parse_user_intent_for_cart_from_llm
+        next:
+          - if: slots.parsed_user_intent == 'CHECKOUT' and slots.cart_item_count > 0
+            then:
+              - set_slots:
+                  - ondemand_current_flow: TOGO_ORDER_CHECKOUT
+              - action: action_checkout_cart
+              - link: ondemand_togo_order_checkout_flow
+          - if: slots.parsed_user_intent == 'CHECKOUT' and slots.cart_item_count <= 0
+            then:
+              - action: utter_not_eligible_for_checkout
+                next: ask_user_intent_for_cart
+          - else:
+              - action: action_handle_user_intent_for_cart
+                next: ask_user_intent_for_cart
+
+
+  ondemand_togo_order_checkout_flow:
+    if: slots.ondemand_current_flow == 'TOGO_ORDER_CHECKOUT' and slots.cart_item_count > 0
+    description: >
+      Guides the user through the checkout process using the IG OnDemand app with ToGo profile.
+      Here the user can view the Order Summary and Apply Discounts or Add Tips if applicable.
+    steps:
+      - action: utter_cart_checkout
+      - action: utter_summarize_cart
+      - link: ondemand_togo_order_goodbye_flow
+
+  ondemand_togo_order_goodbye_flow:
+    if: False
+    description: >
+      Say goodbye to the user and end the IG OnDemand ToGo Order flow.
+    steps:
+      - action: utter_order_goodbye
+      - link: ondemand_end_flow

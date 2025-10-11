@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buy-bot-server-configmap
+data:
+  ENVIRONMENT: 'development'
+
+  RUN_MODE: 'server'
+  DEBUG: 'true'
+
+  RASA_PRO_LICENSE: ${RASA_PRO_LICENSE}
+  RASA_PRO_BETA_PREDICATES_IN_RESPONSE_CONDITIONS: 'true'
+
+  RASA_ACTION_ENDPOINT: 'http://bot-action-server.agys-buy.svc.cluster.local:5055/webhook'
+
+  LLM_API_HEALTH_CHECK: 'true'
+
+  GEMINI_API_KEY: ${GEMINI_API_KEY}

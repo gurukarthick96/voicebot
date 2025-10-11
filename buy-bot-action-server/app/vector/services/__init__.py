@@ -1,0 +1,1 @@
+from .item_vector_service import ItemVectorService, item_vector_service

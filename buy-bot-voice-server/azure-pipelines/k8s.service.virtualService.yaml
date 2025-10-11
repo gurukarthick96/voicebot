@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ingress-buy-bot-voice-server
+spec:
+  hosts:
+    - aks-buy-devint.hospitalityrevolution.com
+    - aks-buy-devint.rguest.internal
+  gateways:
+    - buy-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /bot-voice-server
+      route:
+        - destination:
+            host: bot-voice-server.agys-buy.svc.cluster.local
+            port:
+              number: 8000

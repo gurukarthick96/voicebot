@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buy-bot-voice-server-configmap
+data:
+  ENVIRONMENT: 'development'
+
+  SERVICE_NAME: 'bot-voice-server'
+  BASE_PATH: '/bot-voice-server'
+
+  LOGGING_LEVEL: 'INFO'
+
+  BOT_CLIENT_BASE_URL: 'http://bot-server.agys-buy.svc.cluster.local:5005'
+  BOT_CLIENT_CHANNEL_NAME: 'ondemand_api'

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Voice Bot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="ui/config.js"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+<div class="text-center space-y-6">
+    <h1 class="text-3xl font-bold">🎙️ Voice Bot</h1>
+    <button id="startBtn" class="px-6 py-3 bg-blue-600 rounded-full text-lg hover:bg-blue-700 transition">
+        ▶️ Start Conversation
+    </button>
+    <div id="status" class="text-sm text-gray-400"></div>
+    <div id="transcript" class="mt-4 text-lg font-medium"></div>
+</div>
+<script type="module" src="static/start.js"></script>
+</body>
+</html>

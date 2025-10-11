@@ -1,0 +1,27 @@
+# The config recipe.
+# https://rasa.com/docs/rasa-pro/nlu-based-assistants/model-configuration/
+recipe: default.v1
+
+# The assistant project unique identifier
+# This default value must be replaced with a unique assistant name within your deployment
+assistant_id: bot-server
+
+# Configuration for Rasa NLU.
+# https://rasa.com/docs/rasa-pro/nlu-based-assistants/components/
+language: en
+
+# See https://rasa.com/docs/rasa-pro/nlu-based-assistants/model-configuration for more information.
+pipeline:
+  - name: CompactLLMCommandGenerator
+    llm:
+      model_group: gemini_llm
+    flow_retrieval:
+      active: false
+#    user_input:
+#      max_characters: 420
+
+# Configuration for Rasa Core.
+# See https://rasa.com/docs/rasa-pro/concepts/policies/policy-overview for more information.
+policies:
+  - name: FlowPolicy
+#  - name: EnterpriseSearchPolicy

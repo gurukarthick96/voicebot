@@ -1,0 +1,14 @@
+#flows:
+#  pattern_chitchat:
+#    description: |
+#      Conversation repair flow for off-topic interactions that won't disrupt the main conversation of IG OnDemand app.
+#      Should not respond to greetings or anything else for which there is a flow defined
+#    name: pattern chitchat
+#    steps:
+#      - action: utter_free_chitchat_response
+#
+#  pattern_search:
+#    description: Flow for handling knowledge-based questions for IG OnDemand app
+#    name: pattern search
+#    steps:
+#      - action: utter_free_chitchat_response

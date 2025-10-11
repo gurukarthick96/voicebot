@@ -1,0 +1,52 @@
+version: "3.1"
+
+intents: [ ]
+
+entities: [ ]
+
+slots:
+  user_intent_for_cart:
+    type: categorical
+    values:
+      - CHECKOUT
+      - ADD_ITEMS
+      - UPDATE_ITEMS
+      - DELETE_ITEMS
+    mappings:
+      - type: from_llm
+  cart_item_count:
+    type: float
+    initial_value: 0
+    mappings:
+      - type: controlled
+  cart_summary:
+    type: text
+    mappings:
+      - type: controlled
+
+responses:
+  utter_ask_user_intent_for_cart:
+    - text: "You can start by saying your order."
+    - text: "Go ahead, just tell me what you'd like to have!"
+    - text: "Feeling hungry? What would you like to order?"
+    - condition: slots.cart_item_count > 0
+      text: "Anything else you'd like to have?"
+    - condition: slots.cart_item_count > 0
+      text: "Would you like to add or modify any items?"
+    - condition: slots.cart_item_count > 0
+      text: "Want to make another change before checkout?"
+
+  utter_not_eligible_for_checkout:
+    - text: "Cart is empty, cannot checkout!"
+    - text: "Oops! Your cart is empty!"
+    - text: "No items added to checkout"
+    - text: "Add some items before checkout!"
+
+  utter_cart_checkout:
+    - text: "Checking out your order!"
+    - text: "Proceeding with your order checkout."
+
+actions:
+  - action_parse_user_intent_for_cart_from_llm
+  - action_handle_user_intent_for_cart
+  - action_checkout_cart

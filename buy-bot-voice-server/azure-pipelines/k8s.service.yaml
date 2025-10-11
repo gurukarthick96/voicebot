@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: 'bot-voice-server'
+  namespace: 'agys-buy'
+  labels:
+    app: 'bot-voice-server'
+    service: 'bot-voice-server'
+spec:
+  selector:
+    app: 'bot-voice-server'
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 'bot-voice-server'
+  namespace: 'agys-buy'
+  labels:
+    app: 'bot-voice-server'
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: 'bot-voice-server'
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: 'bot-voice-server'
+        version: v1
+    spec:
+      nodeSelector:
+        nodepool: buydevint
+      topologySpreadConstraints:
+        - maxSkew: 3
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: 'bot-voice-server'
+      containers:
+        - name: 'bot-voice-server'
+          image: 'agysacrqa.azurecr.io/buy-bot-voice-server:latest'
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: http
+          resources:
+            limits:
+              cpu: '1000m'
+              memory: '4096Mi'
+          livenessProbe:
+            httpGet:
+              path: /bot-voice-server/internal/ping
+              port: 8000
+            initialDelaySeconds: 60
+            failureThreshold: 2
+            periodSeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /bot-voice-server/internal/health
+              port: 8000
+            failureThreshold: 60
+            periodSeconds: 10
+            timeoutSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /bot-voice-server/internal/health
+              port: 8000
+            failureThreshold: 60
+            periodSeconds: 10
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: buy-bot-voice-server-configmap
+            - secretRef:
+                name: buy-bot-server-secret

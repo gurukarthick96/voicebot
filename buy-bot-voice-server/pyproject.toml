@@ -1,0 +1,47 @@
+[project]
+name = "bot-voice-server"
+version = "0.1.0"
+description = "An AI-powered bot voice server built with FastAPI and integrated with Speech-to-Text (STT) and Text-to-Speech (TTS) components. It also features a simple static UI with Jinja2."
+authors = [{ name = "Guru Karthick", email = "gurukarthick.chellamuthu@agilysys.com" }]
+maintainers = [{ name = "Guru Karthick", email = "gurukarthick.chellamuthu@agilysys.com" }]
+readme = "README.md"
+requires-python = "==3.11.*"
+dependencies = [
+    # STT
+    "SpeechRecognition>=3.14.3",
+    # TTS
+    "gtts>=2.5.4",
+    "pydub>=0.25.1", # Need to install ffmpeg separately
+    # FastAPI
+    "fastapi>=0.115.14",
+    "uvicorn[standard]>=0.35.0",
+    "jinja2>=3.1.6",
+    # Others
+    "coloredlogs>=15.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.35.0", # Needed for shorthand poe cli commands
+]
+
+pyaudio = [
+    "pyaudio>=0.2.14", # Needed for pyaudio_listener.py
+    "webrtcvad>=2.0.10",
+    "setuptools>=80.9.0",
+]
+
+faster-whisper-stt = [
+    "SpeechRecognition[faster-whisper]>=3.14.3", # Needed for whisper_stt_service.py
+]
+vosk-stt = [
+    "vosk>=0.3.45", # Needed for vosk_stt_service.py
+]
+
+coqui-tts = [
+    "tts>=0.22.0", # Needed for coqui_tts_service.py
+    "sounddevice>=0.5.2",
+]
+py-tts = [
+    "pyttsx3>=2.98", # Needed for py_tts_service.py
+]

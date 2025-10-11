@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ingress-buy-bot-action-server
+spec:
+  hosts:
+    - aks-buy-devint.hospitalityrevolution.com
+    - aks-buy-devint.rguest.internal
+  gateways:
+    - buy-gateway
+  http:
+    - match:
+        - uri:
+            exact: /bot-action-server
+        - uri:
+            prefix: /bot-action-server/
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: bot-action-server.agys-buy.svc.cluster.local
+            port:
+              number: 5055

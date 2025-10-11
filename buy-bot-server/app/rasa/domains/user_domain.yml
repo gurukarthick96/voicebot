@@ -1,0 +1,24 @@
+version: "3.1"
+
+intents: [ ]
+
+entities: [ ]
+
+slots:
+  parsed_user_input:
+    type: text
+    mappings:
+      - type: controlled
+  parsed_user_intent:
+    type: categorical
+    mappings:
+      - type: controlled
+
+responses:
+  utter_not_implemented:
+    - text: "This feature not implemented yet. Please try later!"
+
+  utter_invalid_slot:
+    - text: "Slot was invalid. Please try again!"
+
+actions: [ ]

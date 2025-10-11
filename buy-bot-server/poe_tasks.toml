@@ -1,0 +1,97 @@
+[tool.poe.env]
+RASA_DATA = "--data app/rasa/data"
+RASA_CONFIG = "--config app/rasa/config.yml"
+RASA_DOMAIN = "--domain app/rasa/domains"
+RASA_ENDPOINTS = "--endpoints app/rasa/endpoints.yml"
+RASA_CREDENTIALS = "--credentials app/rasa/credentials.yml"
+RASA_API_PORT = "--port 5005"
+
+DOCKER_IMAGE_NAME = "buy-bot-server"
+DOCKER_CONTAINER_NAME = "buy-bot-server"
+DOCKER_BUILD_ARGS = "--build-arg RASA_PRO_LICENSE=${RASA_PRO_LICENSE} --build-arg GEMINI_API_KEY=${GEMINI_API_KEY} --build-arg RASA_ACTION_ENDPOINT=${RASA_ACTION_ENDPOINT}"
+DOCKER_RUN_ENVS = "--env-file .env -e RASA_PRO_LICENSE=${RASA_PRO_LICENSE} -e GEMINI_API_KEY=${GEMINI_API_KEY}"
+
+
+[tool.poe.tasks.clean]
+cmd = "rm -rf .rasa"
+help = "Cleans Rasa cache (.rasa folder)."
+
+[tool.poe.tasks.clean-all]
+cmd = "rm -rf models .rasa"
+help = "Cleans all models (models folder) and Rasa cache (.rasa folder)."
+
+[tool.poe.tasks.train]
+cmd = "rasa train ${RASA_DATA} ${RASA_CONFIG} ${RASA_DOMAIN} ${RASA_ENDPOINTS}"
+help = "Trains a Rasa model. Use -vv for verbose mode."
+
+[tool.poe.tasks.api]
+cmd = "rasa run --enable-api ${RASA_API_PORT} ${RASA_ENDPOINTS} ${RASA_CREDENTIALS}"
+help = "Runs the RASA API server. Use -vv for verbose mode."
+
+[tool.poe.tasks.inspect]
+cmd = "rasa inspect ${RASA_ENDPOINTS}"
+help = "Inspects a trained Rasa model via browser. Use -vv for verbose mode."
+
+[tool.poe.tasks.clean-train-api]
+sequence = ["clean-all", "train -vv", "api -vv"]
+help = "Cleans models and cache. Then Trains and Runs the Rasa model as API server."
+
+[tool.poe.tasks.clean-train-inspect]
+sequence = ["clean-all", "train -vv", "inspect -vv"]
+help = "Cleans models and cache. Then Trains and Inspects the Rasa model via browser."
+
+[tool.poe.tasks.docker-build]
+cmd = "docker build -D --no-cache ${DOCKER_BUILD_ARGS} -t ${DOCKER_IMAGE_NAME} ."
+help = "Build a Docker image from Dockerfile."
+
+[tool.poe.tasks.docker-run]
+cmd = "docker run -d -p 5005:5005 -e DEBUG=false -e RUN_MODE=inspect ${DOCKER_RUN_ENVS} --name ${DOCKER_CONTAINER_NAME} ${DOCKER_IMAGE_NAME}"
+help = "Run a Docker conatiner from an image."
+
+[tool.poe.tasks.docker-tag]
+cmd = "docker tag ${DOCKER_IMAGE_NAME} agysacrqa.azurecr.io/${DOCKER_IMAGE_NAME}"
+help = "Tag a Docker image for ACRQA."
+
+[tool.poe.tasks.docker-push]
+cmd = "docker push agysacrqa.azurecr.io/${DOCKER_IMAGE_NAME}"
+help = "Push a Docker image to ACRQA."
+
+[tool.poe.tasks.docker-build-run]
+sequence = ["docker-build", "docker-run"]
+help = "Build Docker image and Run a Docker container from it."
+
+[tool.poe.tasks.docker-tag-push]
+sequence = ["docker-tag", "docker-push"]
+help = "Tag a Docker image and push it to ACRQA."
+
+[tool.poe.tasks.docker-build-tag-push]
+sequence = ["docker-build", "docker-tag", "docker-push"]
+help = "Build Docker image, tag and push it to ACRQA."
+
+[tool.poe.tasks.deploy]
+cmd = """
+kubectl apply -f azure-pipelines/k8s.service.configMap.yaml
+              -f azure-pipelines/k8s.service.virtualService.yaml
+              -f azure-pipelines/k8s.service.yaml
+"""
+help = "Deploy Service to AKS Cluster."
+
+[tool.poe.tasks.undeploy]
+cmd = """
+kubectl delete -f azure-pipelines/k8s.service.configMap.yaml
+               -f azure-pipelines/k8s.service.virtualService.yaml
+               -f azure-pipelines/k8s.service.yaml
+"""
+help = "Undeploy Service from AKS Cluster."
+
+[tool.poe.tasks]
+cl.ref = "clean"
+ca.ref = "clean-all"
+a.ref = "api"
+t.ref = "train"
+i.ref = "inspect"
+cta.ref = "clean-train-api"
+cti.ref = "clean-train-inspect"
+dbr.ref = "docker-build-run"
+dtp.ref = "docker-tag-push"
+dbtp.ref = "docker-build-tag-push"

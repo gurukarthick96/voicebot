@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buy-bot-action-server-configmap
+data:
+  ENVIRONMENT: 'development'
+
+  SERVICE_NAME: 'bot-action-server'
+
+  DEBUG: 'true'
+  LOGGING_LEVEL: 'INFO'
+
+  VECTOR_DB_URL: ':memory:'
+
+  GEMINI_API_KEY: ${GEMINI_API_KEY}
+
+  GEMINI_MODEL_NAME: 'gemini-2.0-flash-lite'
+  TEXT_EMBEDDING_MODEL_NAME: 'sentence-transformers/all-MiniLM-L6-v2'

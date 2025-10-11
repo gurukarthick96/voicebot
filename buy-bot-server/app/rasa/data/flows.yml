@@ -1,0 +1,22 @@
+flows:
+  goodbye_flow:
+    description: Say goodbye to the user and trigger restart action.
+    steps:
+      - action: utter_goodbye
+      - link: end_flow
+
+  end_flow:
+    if: False
+    description: Reached end of the flow, trigger restart action.
+    persisted_slots:
+      - ondemand_current_flow
+    steps:
+      - set_slots:
+          - ondemand_current_flow: END
+      - link: restart_flow
+
+  restart_flow:
+    if: False
+    description: Trigger restart action.
+    steps:
+      - action: action_restart

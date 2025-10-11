@@ -1,0 +1,36 @@
+# Version Control
+.git
+.gitignore
+
+# Docker
+.docker
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+**/.cache
+
+# Virtual Environments
+.venv/
+venv/
+
+# IDE and Editors
+.vscode/
+.idea/
+
+# Documentation
+docs/
+**/*.md
+
+# Logs
+**/*.log
+logs/
+
+# Environment variables
+.env*

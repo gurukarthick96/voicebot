@@ -1,0 +1,38 @@
+flows:
+  ondemand_greet_flow:
+    name: OnDemand greeting flow
+    description: Greet the user to IG OnDemand app and ask them for next action.
+    run_pattern_completed: False
+    persisted_slots:
+      - ondemand_workflow_type
+      - ondemand_current_flow
+    steps:
+      - set_slots:
+          - ondemand_current_flow: START
+      - action: utter_ondemand_greet
+      - id: ask_ondemand_workflow_type
+        collect: ondemand_workflow_type
+        description: Given a user utterance, extract the workflow type such as ORDER_FOOD or SIGN_IN
+        next:
+          - if: slots.ondemand_workflow_type == 'ORDER_FOOD'
+            then:
+              - link: ondemand_togo_order_flow
+          - if: slots.ondemand_workflow_type == 'SIGN_IN'
+            then:
+              - link: ondemand_togo_sign_in_flow
+          - else:
+              - action: utter_invalid_slot
+              - link: ondemand_goodbye_flow
+
+  ondemand_goodbye_flow:
+    if: False
+    description: Say goodbye to the user and end the IG OnDemand flow
+    steps:
+      - action: utter_ondemand_goodbye
+      - link: ondemand_end_flow
+
+  ondemand_end_flow:
+    if: False
+    description: End of the IG OnDemand flow.
+    steps:
+      - link: end_flow

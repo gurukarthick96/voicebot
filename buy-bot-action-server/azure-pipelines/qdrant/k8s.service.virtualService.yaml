@@ -1,0 +1,46 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ingress-buy-qdrant-db
+spec:
+  hosts:
+    - aks-buy-devint.hospitalityrevolution.com
+    - aks-buy-devint.rguest.internal
+  gateways:
+    - buy-gateway
+  http:
+    - match:
+        - uri:
+            exact: /qdrant-db
+        - uri:
+            prefix: /qdrant-db/
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: qdrant-db.agys-buy.svc.cluster.local
+            port:
+              number: 6333
+      timeout: 300s
+      retries:
+        attempts: 3
+        perTryTimeout: 30s
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: buy-qdrant-db-destination
+  namespace: agys-buy
+spec:
+  host: qdrant-db.agys-buy.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 30s
+      http:
+        http1MaxPendingRequests: 100
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        idleTimeout: 90s
+        h2UpgradePolicy: UPGRADE

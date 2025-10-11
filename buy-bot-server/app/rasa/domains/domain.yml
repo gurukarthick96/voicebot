@@ -1,0 +1,44 @@
+version: "3.1"
+
+intents: [ ]
+
+entities: [ ]
+
+slots: { }
+
+responses:
+  utter_greet:
+    - text: "Hello! How can I help you today?"
+
+  utter_goodbye:
+    - text: "Thank you!"
+    - text: "Have a great day!"
+    - text: "Goodbye!"
+    - text: "See Yaa!"
+
+  utter_thanks:
+    - text: "You're welcome!"
+    - text: "Happy to help!"
+
+  utter_nothing:
+    - text: ""
+
+  #  utter_free_chitchat_response:
+  #    - text: "placeholder"
+  #      metadata:
+  #        rephrase: True
+  #        rephrase_prompt: |
+  #          The following is a conversation with an AI assistant built with Gemini.
+  #          The assistant can help the user place an order via IG OnDemand a food ordering app.
+  #          The assistant is helpful, creative, clever, and very friendly.
+  #          The user is making small talk, and the assistant should respond, keeping things light.
+  #          Context / previous conversation with the user:
+  #          {{history}}
+  #          {{current_input}}
+  #          Suggested AI Response:
+
+actions: [ ]
+
+session_config:
+  session_expiration_time: 30
+  carry_over_slots_to_new_session: false

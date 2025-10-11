@@ -1,0 +1,60 @@
+[tool.poe.env]
+APP_PATH = "app:voiceapp"
+
+DOCKER_IMAGE_NAME = "buy-bot-voice-server"
+DOCKER_CONTAINER_NAME = "buy-bot-voice-server"
+DOCKER_RUN_ENVS = "--env-file .env"
+
+[tool.poe.tasks.api]
+cmd = "python -m uvicorn --host 0.0.0.0 --port 8000 --env-file .env ${APP_PATH}"
+help = "Runs the Uvicorn Server for accessign FastAPI."
+
+[tool.poe.tasks.docker-build]
+cmd = "docker build -D --no-cache -t ${DOCKER_IMAGE_NAME} ."
+help = "Build a Docker image from Dockerfile."
+
+[tool.poe.tasks.docker-run]
+cmd = "docker run -d -p 8000:8000 ${DOCKER_RUN_ENVS} --name ${DOCKER_CONTAINER_NAME} ${DOCKER_IMAGE_NAME}"
+help = "Run a Docker conatiner from an image."
+
+[tool.poe.tasks.docker-tag]
+cmd = "docker tag ${DOCKER_IMAGE_NAME} agysacrqa.azurecr.io/${DOCKER_IMAGE_NAME}"
+help = "Tag a Docker image for ACRQA."
+
+[tool.poe.tasks.docker-push]
+cmd = "docker push agysacrqa.azurecr.io/${DOCKER_IMAGE_NAME}"
+help = "Push a Docker image to ACRQA."
+
+[tool.poe.tasks.docker-build-run]
+sequence = ["docker-build", "docker-run"]
+help = "Build Docker image and Run a Docker container from it."
+
+[tool.poe.tasks.docker-tag-push]
+sequence = ["docker-tag", "docker-push"]
+help = "Tag a Docker image and push it to ACRQA."
+
+[tool.poe.tasks.docker-build-tag-push]
+sequence = ["docker-build", "docker-tag", "docker-push"]
+help = "Build Docker image, tag and push it to ACRQA."
+
+[tool.poe.tasks.deploy]
+cmd = """
+kubectl apply -f azure-pipelines/k8s.service.configMap.yaml
+              -f azure-pipelines/k8s.service.virtualService.yaml
+              -f azure-pipelines/k8s.service.yaml
+"""
+help = "Deploy Service to AKS Cluster."
+
+[tool.poe.tasks.undeploy]
+cmd = """
+kubectl delete -f azure-pipelines/k8s.service.configMap.yaml
+               -f azure-pipelines/k8s.service.virtualService.yaml
+               -f azure-pipelines/k8s.service.yaml
+"""
+help = "Undeploy Service from AKS Cluster."
+
+[tool.poe.tasks]
+a.ref = "api"
+dbr.ref = "docker-build-run"
+dtp.ref = "docker-tag-push"
+dbtp.ref = "docker-build-tag-push"

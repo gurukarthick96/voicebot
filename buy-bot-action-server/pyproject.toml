@@ -1,0 +1,32 @@
+[project]
+name = "bot-action-server"
+version = "0.1.0"
+description = "An AI-powered bot action server built with Rasa SDK, integrated with LLM and Vector DB."
+authors = [{ name = "Guru Karthick", email = "gurukarthick.chellamuthu@agilysys.com" }]
+maintainers = [{ name = "Guru Karthick", email = "gurukarthick.chellamuthu@agilysys.com" }]
+readme = "README.md"
+requires-python = "==3.11.*"
+dependencies = [
+    "rasa-sdk>=3.12.0",
+    "google-genai>=1.19.0",
+    "qdrant-client>=1.14.2",
+    "fastembed>=0.6.1",
+    "num2words>=0.5.14",
+    "typeguard>=4.4.3",
+    "python-dotenv>=1.1.0",
+    "spacy>=3.8.7",
+    "en_core_web_sm",
+]
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.35.0", # Needed for shorthand poe cli commands
+]
+
+[tool.uv]
+override-dependencies = [
+    "websockets>=10.0", # Force a range that satisfies both rasa-sdk & google-genai
+]
+
+[tool.uv.sources]
+en_core_web_sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }

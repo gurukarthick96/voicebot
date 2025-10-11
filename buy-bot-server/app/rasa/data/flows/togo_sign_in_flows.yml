@@ -1,0 +1,12 @@
+flows:
+  ondemand_togo_sign_in_flow:
+    if: slots.ondemand_workflow_type == 'SIGN_IN'
+    description: >
+      Guides the user through the sign in or sign up process using the IG OnDemand app with ToGo profile.
+    persisted_slots:
+      - ondemand_current_flow
+    steps:
+      - set_slots:
+          - ondemand_current_flow: TOGO_SIGNIN
+      - action: utter_not_implemented
+      - link: ondemand_goodbye_flow

@@ -1,0 +1,43 @@
+version: "3.1"
+
+intents: [ ]
+
+entities: [ ]
+
+slots:
+  ondemand_workflow_type:
+    type: categorical
+    values:
+      - HOME
+      - ORDER_FOOD
+      - SIGN_IN
+  ondemand_current_flow:
+    type: categorical
+    values:
+      - START
+      - TOGO_ORDER_CART
+      - TOGO_ORDER_CHECKOUT
+      - TOGO_ORDER_PAYMENT
+      - TOGO_SIGNIN
+      - END
+    mappings:
+      - type: controlled
+
+responses:
+  utter_ondemand_greet:
+    - text: "Welcome to OnDemand!"
+    - text: "Hey there! OnDemand here!!"
+      metadata:
+        rephrase: False
+
+  utter_ondemand_goodbye:
+    - text: "Thank you for choosing OnDemand!"
+    - text: "Grateful to have you with OnDemand!"
+
+  utter_ask_ondemand_workflow_type:
+    - text: "What can I help you with today? Food, Login, or something else?"
+    - text: "Would like to do order food, sign in to your account, or something new?"
+    - text: "How can I assist you today? You can order food, sign in or sign up, or select any other option."
+    - text: "Ready when you are! Food, Sign In, or something else – just say the word!"
+
+actions: [ ]

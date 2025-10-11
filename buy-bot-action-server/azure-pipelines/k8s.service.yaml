@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: 'bot-action-server'
+  namespace: 'agys-buy'
+  labels:
+    app: 'bot-action-server'
+    service: 'bot-action-server'
+spec:
+  selector:
+    app: 'bot-action-server'
+  ports:
+    - name: http
+      port: 5055
+      targetPort: 5055
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 'bot-action-server'
+  namespace: 'agys-buy'
+  labels:
+    app: 'bot-action-server'
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: 'bot-action-server'
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: 'bot-action-server'
+        version: v1
+    spec:
+      nodeSelector:
+        nodepool: buydevint
+      topologySpreadConstraints:
+        - maxSkew: 3
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: 'bot-action-server'
+      containers:
+        - name: 'bot-action-server'
+          image: 'agysacrqa.azurecr.io/buy-bot-action-server:latest'
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5055
+              name: http
+          resources:
+            limits:
+              cpu: '1000m'
+              memory: '4096Mi'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5055
+            initialDelaySeconds: 60
+            failureThreshold: 2
+            periodSeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5055
+            failureThreshold: 60
+            periodSeconds: 10
+            timeoutSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5055
+            failureThreshold: 60
+            periodSeconds: 10
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: buy-bot-action-server-configmap
+            - secretRef:
+                name: buy-bot-server-secret
