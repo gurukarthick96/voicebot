@@ -1,3 +1,4 @@
+from cachetools import TTLCache, cached
 from google.genai import Client
 from google.genai.types import GenerateContentConfig
 
@@ -13,15 +14,23 @@ class GeminiService(AbstractGenAIService):
     def __init__(self, api_key: str, model_name: str):
         self.client = Client(api_key=api_key)
         self.model_name = model_name
+        self.cache = TTLCache(maxsize=100, ttl=3600)
 
+    @cached
     def generate_text(self, input_text: str, config_type: ConfigType, temperature: float = None) -> str:
+        cache_key = (input_text, config_type, temperature)
+        if cache_key in self.cache:
+            return self.cache[cache_key]
+
         response = self.client.models.generate_content(
             model=self.model_name,
             contents=input_text,
             config=self._build_config(config_type, temperature)
         )
 
-        return response.text
+        result = response.text
+        self.cache[cache_key] = result
+        return result
 
     def _build_config(self, config_type: ConfigType, temperature) -> GenerateContentConfig:
         config_meta: ConfigMeta = config_type.value
