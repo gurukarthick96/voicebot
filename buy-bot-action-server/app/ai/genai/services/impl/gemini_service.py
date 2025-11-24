@@ -16,7 +16,6 @@ class GeminiService(AbstractGenAIService):
         self.model_name = model_name
         self.cache = TTLCache(maxsize=100, ttl=3600)
 
-    @cached
     def generate_text(self, input_text: str, config_type: ConfigType, temperature: float = None) -> str:
         cache_key = (input_text, config_type, temperature)
         if cache_key in self.cache:
